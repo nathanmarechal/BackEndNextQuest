@@ -1,0 +1,21 @@
+name: nextquest
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - sqlalchemy
+      - pymysql
+      - lightfm
+      - scikit-learn
+      - joblib
+      - pandas
+      - numpy
+      - pydantic
+      - python-dotenv
+      - apscheduler
+      - pydantic[email]
