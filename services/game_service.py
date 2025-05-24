@@ -1,9 +1,57 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models.model import Game
+from models.model import (
+    Game, PlatformGame, Platform, PerspectiveGame, Perspective,
+    GenreGame, Genre, Developer, GameModeGame, GameMode, ThemeGame, Theme
+)
 from sqlalchemy.orm import joinedload
 
+def list_games_service(
+    db,
+    offset=0,
+    limit=10,
+    order_by_name=False,
+    genre=None,
+    platform=None,
+    developer=None,
+    perspective=None,
+    game_mode=None,
+    theme=None,
+    name=None
+):
+    query = db.query(Game)
 
+    if name:
+        query = query.filter(Game.name.ilike(f"%{name}%"))
+
+    if platform:
+        query = query.join(PlatformGame, Game.app_id == PlatformGame.app_id) \
+            .join(Platform, PlatformGame.id_platform == Platform.id_platform) \
+            .filter(Platform.nom_platform.in_(platform))
+    if perspective:
+        query = query.join(PerspectiveGame, Game.app_id == PerspectiveGame.app_id) \
+            .join(Perspective, PerspectiveGame.id_perspective == Perspective.id_perspective) \
+            .filter(Perspective.nom_perspective.in_(perspective))
+    if genre:
+        query = query.join(GenreGame, Game.app_id == GenreGame.app_id) \
+            .join(Genre, GenreGame.id_genre == Genre.id_genre) \
+            .filter(Genre.name_genre.in_(genre))
+    if developer:
+        query = query.join(Developer, Game.id_developer == Developer.id_developer) \
+            .filter(Developer.name_developer.in_(developer))
+    if game_mode:
+        query = query.join(GameModeGame, Game.app_id == GameModeGame.app_id) \
+            .join(GameMode, GameModeGame.Id_Game_mode == GameMode.Id_Game_mode) \
+            .filter(GameMode.nom_game_mode.in_(game_mode))
+    if theme:
+        query = query.join(ThemeGame, Game.app_id == ThemeGame.app_id) \
+            .join(Theme, ThemeGame.id_theme == Theme.id_theme) \
+            .filter(Theme.nom_theme.in_(theme))
+
+    if order_by_name:
+        query = query.order_by(Game.name)
+    query = query.offset(offset).limit(limit)
+    return query.all()
 
 def get_game_by_name(name: str, db: Session):
     print(f"[DEBUG] Requête pour le nom : {name}")
@@ -68,3 +116,14 @@ def deslugify(slug: str) -> str:
     text = re.sub(r'\s+', ' ', text).strip()
 
     return text
+
+
+def get_game_filters_service(db):
+    return {
+        "platforms": [p.nom_platform for p in db.query(Platform).all()],
+        "perspectives": [p.nom_perspective for p in db.query(Perspective).all()],
+        "genres": [g.name_genre for g in db.query(Genre).all()],
+        "developers": [d.name_developer for d in db.query(Developer).all()],
+        "game_modes": [g.nom_game_mode for g in db.query(GameMode).all()],
+        "themes": [t.nom_theme for t in db.query(Theme).all()]
+    }

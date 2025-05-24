@@ -32,3 +32,35 @@ Content-Type: application/json
 
 GET http://127.0.0.1:8000/game/Call of Duty: World at War
 Accept: application/json
+
+###
+POST http://127.0.0.1:8000/review/get_review_by_game_name_five_per_five
+Content-Type: application/json
+
+{
+  "game_name": "Call of Duty: World at War",
+  "offset": 5,
+  "limit": 5
+
+}
+
+###
+POST http://127.0.0.1:8000/game/
+Content-Type: application/json
+
+{
+  "offset": 0,
+  "limit": 10,
+  "order_by_name": true,
+  "genre": ["FPS", "Action"],
+  "platform": ["Xbox", "PlayStation"],
+  "developer": null,
+  "perspective": ["Third Person", "First Person"],
+  "game_mode": null,
+  "theme": null,
+  "name": "war"
+}
+
+###
+GET http://127.0.0.1:8000/game/filters
+Accept: application/json

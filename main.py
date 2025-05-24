@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import users
 from routes import recommendation
 from routes import games
+from routes import review
 app = FastAPI()
 origins = [
     "http://localhost:5173",  # frontend React
@@ -25,6 +26,7 @@ logging.basicConfig(level=logging.DEBUG)
 app.include_router(users.router)
 app.include_router(games.router)
 app.include_router(recommendation.router)
+app.include_router(review.router)
 @app.get("/")
 async def root():
     return {"message": "Hello World"}

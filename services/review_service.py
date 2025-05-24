@@ -51,3 +51,34 @@ def get_top_liked_games_last_7_days(db: Session, limit: int = 30):
         results.append(jeu_dict)
 
     return results
+
+def get_review_by_game_name_five_per_five(db: Session, name: str, offset: int = 0, limit: int = 5):
+    """
+    Récupère les critiques d'un jeu par son nom, avec pagination.
+    """
+    print(f"[DEBUG] Requête pour le nom : {name}")
+
+    try:
+        jeu = (
+            db.query(Game)
+            .filter(func.lower(Game.name) == name.lower())
+            .first()
+        )
+        print(f"[DEBUG] Jeu trouvé : {jeu.name if jeu else 'Aucun'}")
+    except Exception as e:
+        print(f"[ERROR] Exception SQL : {e}")
+        raise
+
+    if not jeu:
+        return None
+
+    reviews = (
+        db.query(Review)
+        .filter(Review.app_id == jeu.app_id)
+        .order_by(Review.date_review.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    return reviews

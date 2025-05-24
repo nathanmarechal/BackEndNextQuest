@@ -162,4 +162,11 @@ UPDATE review SET isliked = CASE WHEN review_score >= 1 THEN TRUE ELSE FALSE END
 
 select * from review where isliked = 1;
 
-SELECT * FROM games WHERE name LIKE '%Arma%';
+SELECT * FROM games WHERE name LIKE '%tennis%';
+
+SELECT * FROM games
+JOIN platforms_games pg on games.app_id = pg.app_id
+JOIN platforms pl on pl.id_platform = pg.id_platform
+JOIN perspectives_games p on games.app_id = p.app_id
+JOIN perspectives ps on ps.id_perspective = p.id_perspective
+WHERE pl.nom_platform = 'Xbox' AND ps.nom_perspective = 'Third Person' AND games.name LIKE '%war%';
