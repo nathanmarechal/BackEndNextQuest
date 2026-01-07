@@ -6,28 +6,50 @@ class User(BaseModel):
     id_user: int
     name_user: str
     email_user: EmailStr
-    age_user: Optional[int] = None
+    birthdate: date = None
 
     class Config:
         from_attributes = True
 
-class UserCreate(User):
+class UserCreate(BaseModel):
+    email: EmailStr
+    username: str
     password: str
-
-class User(User):
-    id_user: int
+    birthdate: date
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class UserOut(BaseModel):
+    id_user: int
+    name_user: str
+    email_user: EmailStr
+    date_of_birth: date
+
+    class Config:
+        from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+    class Config:
+        from_attributes = True
+
 
 class ReviewBase(BaseModel):
     review: Optional[str] = None
     review_score: int
     date_review: Optional[date] = None
 
-class ReviewCreate(ReviewBase):
+class ReviewCreate(BaseModel):
     id_user: int
     app_id: int
+    review: str
+    review_score: float
+    date_review: str
+    name_user: str
 
 class Review(ReviewBase):
     id_user: int
@@ -75,3 +97,17 @@ class GameListRequest(BaseModel):
     game_mode: Optional[List[str]] = None
     theme: Optional[List[str]] = None
     name: Optional[str] = None
+
+class LikeRequest(BaseModel):
+    user_id: int
+    app_id: int
+    liked: bool
+
+class AssistantChatRequest(BaseModel):
+    message: str
+    gameTitle: Optional[str] = None
+    conversationId: Optional[str] = None
+
+class AssistantChatResponse(BaseModel):
+    reply: str
+    conversationId: Optional[str] = None

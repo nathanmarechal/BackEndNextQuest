@@ -1,6 +1,5 @@
-from xmlrpc.client import Boolean
-
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Table
+from pydantic_core.core_schema import DateSchema
+from sqlalchemy import Column, Boolean, Integer, String, Text, ForeignKey, Table
 from sqlalchemy.types import Date
 from sqlalchemy.orm import relationship
 from database import Base
@@ -36,13 +35,15 @@ class PerspectiveGame(Base):
 
 class User(Base):
     __tablename__ = "users"
+
     id_user = Column(Integer, primary_key=True, index=True)
-    password = Column(String(50))
+    password = Column(String(100), nullable=False)
     name_user = Column(String(250), nullable=False)
-    age_user = Column(Integer)
     email_user = Column(String(250), nullable=False)
+    date_of_birth = Column(Date)
 
     reviews = relationship("Review", back_populates="user")
+    likes = relationship("IsLiked", back_populates="user")
 
 class Genre(Base):
     __tablename__ = "genres"
@@ -99,6 +100,7 @@ class Game(Base):
 
     developer = relationship("Developer", back_populates="games")
     reviews = relationship("Review", back_populates="game")
+    likes = relationship("IsLiked", back_populates="game")
 
     genres = relationship("Genre", secondary="genres_games", back_populates="games")
     platforms = relationship("Platform", secondary="platforms_games", back_populates="games")
@@ -113,8 +115,16 @@ class Review(Base):
     review = Column(String(200))
     review_score = Column(Integer)
     date_review = Column(Date)
-    isliked = Column(Integer, default=False)
 
     user = relationship("User", back_populates="reviews")
     game = relationship("Game", back_populates="reviews")
 
+class IsLiked(Base):
+    __tablename__ = "isliked"
+
+    id_user = Column(Integer, ForeignKey("users.id_user"), primary_key=True)
+    app_id = Column(Integer, ForeignKey("games.app_id"), primary_key=True)
+    isliked_value = Column(Boolean, nullable=False)
+
+    user = relationship("User", back_populates="likes")
+    game = relationship("Game", back_populates="likes")

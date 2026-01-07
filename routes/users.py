@@ -4,17 +4,15 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from database import get_db
 from models.model import User as UserModel
-from schemas.schema import User, UserCreate
+from schemas.schema import User, UserCreate, UserLogin, UserOut
+from services.user_service import create_access_token, login_user, create_user_service
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/", response_model=User)
+@router.post("/", response_model=UserOut)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = UserModel(**user.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    db_user = create_user_service(db, user)
     return db_user
 
 @router.get("/{user_id}", response_model=User)
@@ -28,3 +26,10 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 @router.get("/", response_model=list[User])
 def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(UserModel).offset(skip).limit(limit).all()
+
+
+@router.post("/login", response_model=dict)
+def login(credentials: UserLogin, db: Session = Depends(get_db)):
+    user = login_user(db, credentials)
+    token = create_access_token(data={"sub": str(user.id_user)})
+    return {"access_token": token, "token_type": "bearer", "user_id": user.id_user}

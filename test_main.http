@@ -64,3 +64,28 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/game/filters
 Accept: application/json
+
+###
+POST http://127.0.0.1:8000/users/
+Content-Type: application/json
+
+{
+  "email": "testuser280520252@gmail.com",
+  "username": "testuser",
+  "password": "testpassword",
+  "birthdate": "1990-01-01"
+}
+
+###
+GET http://127.0.0.1:8000/review/check_like/1/1
+Content-Type: application/json
+
+###
+POST http://localhost:8000/review/like_game
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "app_id": 1,
+  "liked": false
+}

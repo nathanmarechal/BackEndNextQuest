@@ -11,6 +11,7 @@ USE NextQuest;
 #DROP TABLE IF EXISTS platforms_games;
 #DROP TABLE IF EXISTS genres_games;
 #DROP TABLE IF EXISTS review;
+#DROP TABLE IF EXISTS isLiked;
 #DROP TABLE IF EXISTS games;
 #DROP TABLE IF EXISTS developers;
 #DROP TABLE IF EXISTS perspectives;
@@ -170,3 +171,57 @@ JOIN platforms pl on pl.id_platform = pg.id_platform
 JOIN perspectives_games p on games.app_id = p.app_id
 JOIN perspectives ps on ps.id_perspective = p.id_perspective
 WHERE pl.nom_platform = 'Xbox' AND ps.nom_perspective = 'Third Person' AND games.name LIKE '%war%';
+
+#remplacer l'age par la date de naissance
+ALTER TABLE users ADD COLUMN date_of_birth DATE;
+ALTER TABLE users DROP COLUMN age_user;
+
+ALTER TABLE users MODIFY password VARCHAR(100);
+
+SELECT * FROM users;
+
+SELECT * FROM users WHERE email_user = 'createAccounttest2@mail.com';
+
+SELECT * FROM review
+JOIN users u on u.id_user = review.id_user
+where email_user = 'createAccounttest2@mail.com';
+
+UPDATE review
+SET review.isliked = -1
+WHERE review.review_score = -1;
+
+CREATE TABLE isliked (
+    id_user INT NOT NULL,
+    app_id INT NOT NULL,
+    isliked_value BOOLEAN NOT NULL,
+    PRIMARY KEY (id_user, app_id),
+    FOREIGN KEY (id_user) REFERENCES users(id_user),
+    FOREIGN KEY (app_id) REFERENCES games(app_id)
+);
+
+-- Step 2: Populate the isliked table with existing data
+INSERT INTO isliked (id_user, app_id, isliked_value)
+SELECT id_user, app_id, isliked
+FROM review;
+
+-- Step 3: Remove the isliked column from the review table
+ALTER TABLE review DROP COLUMN isliked;
+
+
+SELECT * FROM isLiked where id_user = 427977 AND app_id = 518;
+
+#selectionner toutes les reviews d'un jeu
+SELECT name, review.review, review.review_score, review.date_review, users.name_user
+FROM review
+JOIN users ON review.id_user = users.id_user
+JOIN games g on g.app_id = review.app_id
+WHERE review.app_id = 518;
+
+#selectionner une review par son texte
+SELECT name, review.review, review.review_score, review.date_review, users.name_user
+FROM review
+JOIN users ON review.id_user = users.id_user
+JOIN games g on g.app_id = review.app_id
+WHERE review.review LIKE '%Create a user.ini file which contains a single line: ''gmpcr_unlock_frame_rate%';
+
+SELECT * FROM users;
